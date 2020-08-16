@@ -1,0 +1,12 @@
+#include <iostream>
+#include "field.h"
+
+
+Field::Field()
+{}
+
+char setsign(const Field& field)
+{
+    sign=' ';
+    return sign;
+}

@@ -1,0 +1,38 @@
+#include <iostream>
+#include "random_candy.h"
+
+Random_candy::Random_candy()
+{
+    candy = new Candy();
+    int i;
+    i = (rand()%5)+1;
+
+    switch(i)
+    {
+    case 1:
+        candy = new Candy(Candy::RED);
+        color=candy->print();
+        delete candy;
+        break;
+    case 2:
+        candy = new Candy(Candy::BLUE);
+        color=candy->print();
+        delete candy;
+        break;
+    case 3:
+        candy = new Candy(Candy::GREEN);
+        color=candy->print();
+        delete candy;
+        break;
+    case 4:
+        candy = new Candy(Candy::ORANGE);
+        color=candy->print();
+        delete candy;
+        break;
+    case 5:
+        candy = new Candy(Candy::YELLOW);
+        color=candy->print();
+        break;
+    }
+}
+
