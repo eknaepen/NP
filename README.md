@@ -27,6 +27,16 @@ Client able to connect to server via broker and play the game
 <br/><br/>
 
 ### Start
-Server listing on Candy>start?> and answers with Candy>start!> to cofirm start of the game
-### Grid dimentions
-Server is listening to Candy>x!> to get x and Candy>y!> to get y
+Server listening on Candy>start?> and answers with Candy>start!> to cofirm start of the game
+### Grid Dimentions
+Server is listening to Candy>x!> to get x and Candy>y!> to get y and makes a grid
+### Print Grid
+Client sends Candy>grid?> and starts listening to Candy>grid!> to print the grid
+### Play
+Server listening to Candy>play!> for comfirmation
+### Colum and Row
+Server sends Candy>colum?> or Candy>Row?> and starts listening to Candy>colum!> or Candy>Row!> to prepare for the move
+### Move
+Server sends Candy>move?> and starts listening to Candy>move!> and makes the move
+### Legal
+Server listening to Candy>legal!> to confirm if the move is legal
