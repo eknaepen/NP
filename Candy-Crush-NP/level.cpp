@@ -7,8 +7,8 @@ Level::Level()        // create and fill grid --> playing field or level
     context = zmq_ctx_new();
     pusher = zmq_socket(context, ZMQ_PUSH);
     sub = zmq_socket(context, ZMQ_SUB);
-    //zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
-    //zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
+    /*zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");*/
     zmq_connect(pusher, "tcp://localhost:24041");
     zmq_connect( sub, "tcp://localhost:24042");
 }

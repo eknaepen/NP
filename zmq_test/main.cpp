@@ -78,8 +78,8 @@ void Setup()
     x=a-'0';
     y=b-'0';
 
-    //zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
-    //zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
+    /*zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");*/
     zmq_connect(pusher, "tcp://localhost:24041");
     zmq_connect( sub, "tcp://localhost:24042");
 
@@ -130,7 +130,7 @@ void Move()
     char move[1];
     int illegal;
 
-    /*zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_turn, strlen(get_turn));
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_turn, strlen(get_turn));
     zmq_recv(sub, buffer, 256, 0);
     turn=buffer[12]-'0';
     buffer[0]='\0';
@@ -138,8 +138,9 @@ void Move()
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_score, strlen(get_score));
     zmq_recv(sub, buffer, 256, 0);
     score=buffer[13]-'0';
+    score=score*100;
 
-    cout << "Turn's: " << turn << endl << "Your score: " << score << endl;*/
+    cout << "Turn's: " << turn << endl << "Your score: " << score << endl;
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, colum_ask, strlen(colum_ask));
     zmq_recv(sub, buffer, 256, 0);

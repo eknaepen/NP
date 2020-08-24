@@ -9,8 +9,8 @@ Game::Game()
     char get_x[]="Candy>x!>";
     char get_y[]="Candy>y!>";
     char play[]="Candy>play!>";
-    //char get_score[]="Candy>score!>";
-    //char get_turn[]="Candy>turn!>";
+    char get_score[]="Candy>score!>";
+    char get_turn[]="Candy>turn!>";
 
     char buf[13];
 
@@ -48,16 +48,17 @@ Game::Game()
 
         if(quit==1)             // give option to give up if field is stuck
         {
-            score=level->score*100;
-            /*get_turn[12]=limit-i;
-            get_score[13]=score;
-            cout << score << endl;
+            score=level->score;
+            get_turn[12]=limit-i+'0';
+            get_score[13]=score+'0';
+            //cout << score << endl;
 
             Sleep(1);
             zmq_send(level->pusher, get_turn, strlen(get_turn), 0);
             Sleep(1);
-            zmq_send(level->pusher, get_score, strlen(get_score), 0);*/
-
+            zmq_send(level->pusher, get_score, strlen(get_score), 0);
+            //cout << limit-i << endl << score << endl;
+            Sleep(1);
             Round();
         }
         else
@@ -65,8 +66,8 @@ Game::Game()
             i=limit;
         }
     }
-    score=level->score*100;
-    cout << "Your score: " << score << "\n";
+    //score=level->score*100;
+    //cout << "Your score: " << score << "\n";
 }
 
 void Game::Round()      // do a move and get the combo of the field

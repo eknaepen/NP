@@ -18,7 +18,7 @@ int main()
         switch(NextState)
         {
             case StartUp:
-                cout << "Startup" << endl;
+                //cout << "Startup" << endl;
                 Game * game;        // make a game
                 NextState=Play;
                 break;
