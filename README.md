@@ -1,5 +1,6 @@
 # NP
 
-C++ Candy Crush Game on sever \n
+C++ Candy Crush Game on sever
+
 Client able to connect to server via broker and play the game
 
