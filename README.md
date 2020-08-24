@@ -2,7 +2,7 @@
 
 C++ Candy Crush Game on sever
 
-Client able to connect to server via broker and play the game
+Client able to play the game
 
 <br/><br/>
 
@@ -40,3 +40,10 @@ Server sends Candy>colum?> or Candy>Row?> and starts listening to Candy>colum!> 
 Server sends Candy>move?> and starts listening to Candy>move!> and makes the move
 ### Legal
 Server listening to Candy>legal!> to confirm if the move is legal
+
+<br/><br/>
+
+## Communication
+The client and server communicate via the broker. Both are subscribed on (tcp://benternet.pxl-ea-ict.be:24042) en push to (tcp://benternet.pxl-ea-ict.be:24041).
+When you want to ask something you use ?> and when you answer you use !>. Example: Candy>row?> -->  Candy>row!>8
+Both the client and the server push to the pull port of the broker and subscribe on the publishing port of the broker.
