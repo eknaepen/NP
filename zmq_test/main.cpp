@@ -25,26 +25,25 @@ int main()
                 NextState=Play;
                 break;
             case Play:
-                Move();
                 cout << "Give up=0, Play=1  :";
                 cin >> quit;
+                play[12]=quit;
+                zmq_send(pusher, play, strlen(play), 0);
                 if(quit)
                 {
-
-                    NextState=Play;
+                    NextState=Reset;
                 }
                 else
                 {
-                    NextState=Reset;
+                    Move();
+                    NextState=Play;
                 }
 
                 break;
             case Reset:
                 cout << "play again press 1: ";
                 cin >> reset;       // reset yes=1
-                play[12]=quit;
-                zmq_send(pusher, play, strlen(play), 0);
-                if(reset==1)
+                if(reset)
                 {
                     NextState=StartUp;
                 }
@@ -94,11 +93,6 @@ void Setup()
     Sleep(1);
 
     Print_Grid();
-
-    cout << "Give up=0, Play=1  :";
-    cin >> quit;
-    play[12]=quit;
-    zmq_send(pusher, play, strlen(play), 0);
 }
 
 void Print_Grid()

@@ -132,7 +132,7 @@ void Level::Move()      // make a move on the field
     zmq_recv(sub, buffer, 256, 0);
     move=buffer[12];
     buffer[0]='\0';
-    cout << buffer << endl << move << endl;
+    //cout << buffer << endl << move << endl;
 
     if(Check_Move(b1,a1,move)==3)  // Up        // if move is legal position wise switch the candy's
     {
