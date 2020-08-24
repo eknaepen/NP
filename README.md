@@ -24,6 +24,8 @@ Client able to play the game
 
 * Confirm if move is legal: Candy>legal!
 
+* show turn's and score: Candy>score!> and Candy>turn!>
+
 <br/><br/>
 
 ### Start
@@ -40,6 +42,8 @@ Server sends Candy>colum?> or Candy>Row?> and starts listening to Candy>colum!> 
 Server sends Candy>move?> and starts listening to Candy>move!> and makes the move
 ### Legal
 Server listening to Candy>legal!> to confirm if the move is legal
+### Turn's and Score
+Client listening on Candy>score!> and Candy>turn!> to print the turn's and score
 
 <br/><br/>
 
