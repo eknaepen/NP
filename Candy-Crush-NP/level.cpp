@@ -107,11 +107,12 @@ void Level::Move()      // make a move on the field
     int b1;
     int a2;
     int b2;
-    char move[1];          // choose candy for move
+    char move;          // choose candy for move
     zmq_send(pusher, colum_ask, strlen(colum_ask), 0);
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_colum, strlen(get_colum));
     zmq_recv(sub, buffer, 256, 0);
     b1=buffer[13]-'0';
+    b1++;
     buffer[0]='\0';
 
     zmq_send(pusher, row_ask, strlen(row_ask), 0);
@@ -129,9 +130,9 @@ void Level::Move()      // make a move on the field
     zmq_send(pusher, ask_move, strlen(ask_move), 0);
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_move, strlen(get_move));
     zmq_recv(sub, buffer, 256, 0);
-    move[0]=buffer[12];
-    //cout << buffer << endl << move << endl;
+    move=buffer[12];
     buffer[0]='\0';
+    cout << buffer << endl << move << endl;
 
     if(Check_Move(b1,a1,move)==3)  // Up        // if move is legal position wise switch the candy's
     {
@@ -147,6 +148,7 @@ void Level::Move()      // make a move on the field
     {
         a2=a1;
         b2=b1-1;
+
     }
     else if(Check_Move(b1,a1,move)==2) //Right
     {
@@ -192,21 +194,21 @@ void Level::Move()      // make a move on the field
     }
 }
 
-int Level::Check_Move(int x, int y, char move[10])      // check position of chosen candy and look for wall's or level boundarys
+int Level::Check_Move(int x, int y, char moves)      // check position of chosen candy and look for wall's or level boundarys
 {                                                       // if wall or boundary move is illegal because switch not possible
-    if(strcmp(move,Left)==0 && x!=1)
+    if(moves==Left && x!=1)
     {
         return 1;   //left side --> left move enable
     }
-    if(strcmp(move,Right)==0 && x!=c-2)
+    if(moves==Right && x!=c-2)
     {
         return 2;   //right side --> right move enable
     }
-    if(strcmp(move,Up)==0 && y!=0)
+    if(moves==Up && y!=0)
     {
         return 3;   //top side --> up move enable
     }
-    if(strcmp(move,Down)==0 && y!=r-1)
+    if(moves==Down && y!=r-1)
     {
         return 4;   //bottom side --> down move enable
     }

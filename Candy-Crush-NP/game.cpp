@@ -51,7 +51,7 @@ Game::Game()
             score=level->score*100;
             /*get_turn[12]=limit-i;
             get_score[13]=score;
-            cout << get_turn << endl << get_score << endl;
+            cout << score << endl;
 
             Sleep(1);
             zmq_send(level->pusher, get_turn, strlen(get_turn), 0);

@@ -31,11 +31,11 @@ int main()
                 if(quit)
                 {
 
-                    NextState=Reset;
+                    NextState=Play;
                 }
                 else
                 {
-                    NextState=Play;
+                    NextState=Reset;
                 }
 
                 break;
@@ -103,6 +103,7 @@ void Setup()
 
 void Print_Grid()
 {
+    cout << endl;
     zmq_send(pusher, grid_ask, strlen(grid_ask), 0);
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, grid_ans, strlen(grid_ans));
     cout << "  ";
@@ -127,6 +128,7 @@ void Print_Grid()
         cout << buffer << endl;         // print grid
         buffer[0]='\0';
     }
+    cout << endl;
 }
 
 void Move()
@@ -180,9 +182,11 @@ void Move()
     {
         cout << endl << "Illegal move --> no combo" << endl << endl;
         Print_Grid();
+        Move();
     }
     else
     {
         Print_Grid();
     }
+    Print_Grid();
 }

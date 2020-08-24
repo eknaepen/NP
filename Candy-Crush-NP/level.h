@@ -27,16 +27,16 @@ public:
     void MakeString();  // makes grid into strings for zmq send
     void printGrid();   // prints grid
     void Move();        // make a move on the field
-    int Check_Move(int x, int y, char move[]);  // check if move is legal position wise
+    int Check_Move(int x, int y, char moves);  // check if move is legal position wise
     bool Check_Break_Move(int x, int y);        // check if move is legal combo wise --> no combo no move
     void Find_Combo();          // check for combo's on the field and replace them by new candy
 
 
 private:
-    const char* Up="U";
-    const char* Down="D";
-    const char* Left="L";
-    const char* Right="R";
+    const char Up='U';
+    const char Down='D';
+    const char Left='L';
+    const char Right='R';
 
 };
 
