@@ -29,21 +29,21 @@ int main()
                 cin >> quit;
                 play[12]=quit;
                 zmq_send(pusher, play, strlen(play), 0);
-                if(quit)
-                {
-                    NextState=Reset;
-                }
-                else
+                if(quit=='1')
                 {
                     Move();
                     NextState=Play;
+                }
+                else
+                {
+                    NextState=Reset;
                 }
 
                 break;
             case Reset:
                 cout << "play again press 1: ";
                 cin >> reset;       // reset yes=1
-                if(reset)
+                if(reset==1)
                 {
                     NextState=StartUp;
                 }
