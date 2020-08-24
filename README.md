@@ -47,3 +47,4 @@ Server listening to Candy>legal!> to confirm if the move is legal
 The client and server communicate via the broker. Both are subscribed on (tcp://benternet.pxl-ea-ict.be:24042) en push to (tcp://benternet.pxl-ea-ict.be:24041).
 When you want to ask something you use ?> and when you answer you use !>. Example: Candy>row?> -->  Candy>row!>8
 Both the client and the server push to the pull port of the broker and subscribe on the publishing port of the broker.
+![FlowChart](https://github.com/eknaepen/NP/blob/master/FlowChart/NP.png)
