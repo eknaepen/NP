@@ -11,6 +11,7 @@ void * sub = zmq_socket(context, ZMQ_SUB);
 void Setup();
 void Print_Grid();
 void Move();
+void Score();
 
 using namespace std;
 
@@ -29,6 +30,7 @@ int main()
                 cin >> quit;
                 play[12]=quit;
                 zmq_send(pusher, play, strlen(play), 0);
+                //Score();
                 if(quit=='1')
                 {
                     Move();
@@ -78,15 +80,16 @@ void Setup()
     x=a-'0';
     y=b-'0';
 
-    /*zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
-    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");*/
-    zmq_connect(pusher, "tcp://localhost:24041");
-    zmq_connect( sub, "tcp://localhost:24042");
+    zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
+    //zmq_connect(pusher, "tcp://localhost:24041");
+    //zmq_connect( sub, "tcp://localhost:24042");
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, start_ans, strlen(start_ans));
     zmq_send(pusher, start_ask, strlen(start_ask), 0);
     zmq_recv(sub, buffer, 256, 0);
 
+    Sleep(1);
     zmq_send(pusher, get_x, strlen(get_x), 0);
     Sleep(1);
     zmq_send(pusher, get_y, strlen(get_y), 0);
@@ -130,18 +133,6 @@ void Move()
     char move[1];
     int illegal;
 
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_turn, strlen(get_turn));
-    zmq_recv(sub, buffer, 256, 0);
-    turn=buffer[12]-'0';
-    buffer[0]='\0';
-
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_score, strlen(get_score));
-    zmq_recv(sub, buffer, 256, 0);
-    score=buffer[13]-'0';
-    score=score*100;
-
-    cout << "Turn's: " << turn << endl << "Your score: " << score << endl;
-
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, colum_ask, strlen(colum_ask));
     zmq_recv(sub, buffer, 256, 0);
     cout << "Colum: ";
@@ -184,4 +175,19 @@ void Move()
         Print_Grid();
     }
     Print_Grid();
+}
+
+void Score()
+{
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_turn, strlen(get_turn));
+    zmq_recv(sub, buffer, 256, 0);
+    turn=buffer[12]-'0';
+    buffer[0]='\0';
+
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_score, strlen(get_score));
+    zmq_recv(sub, buffer, 256, 0);
+    score=buffer[13]-'0';
+    score=score*100;
+
+    cout << "Turn's: " << turn << endl << "Your score: " << score << endl;
 }

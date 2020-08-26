@@ -9,8 +9,8 @@ Game::Game()
     char get_x[]="Candy>x!>";
     char get_y[]="Candy>y!>";
     char play[]="Candy>play!>";
-    char get_score[]="Candy>score!>";
-    char get_turn[]="Candy>turn!>";
+    //char get_score[]="Candy>score!>";
+    //char get_turn[]="Candy>turn!>";
 
     char buf[13];
 
@@ -48,7 +48,7 @@ Game::Game()
 
         if(quit==1)             // give option to give up if field is stuck
         {
-            score=level->score;
+            /*score=level->score;
             get_turn[12]=limit-i+'0';
             get_score[13]=score+'0';
             //cout << score << endl;
@@ -58,7 +58,7 @@ Game::Game()
             Sleep(1);
             zmq_send(level->pusher, get_score, strlen(get_score), 0);
             //cout << limit-i << endl << score << endl;
-            Sleep(1);
+            Sleep(1);*/
             Round();
         }
         else

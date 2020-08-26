@@ -7,10 +7,10 @@ Level::Level()        // create and fill grid --> playing field or level
     context = zmq_ctx_new();
     pusher = zmq_socket(context, ZMQ_PUSH);
     sub = zmq_socket(context, ZMQ_SUB);
-    /*zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
-    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");*/
-    zmq_connect(pusher, "tcp://localhost:24041");
-    zmq_connect( sub, "tcp://localhost:24042");
+    zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
+    //zmq_connect(pusher, "tcp://localhost:24041");
+    //zmq_connect( sub, "tcp://localhost:24042");
 }
 
 Level::~Level()
@@ -108,6 +108,7 @@ void Level::Move()      // make a move on the field
     int a2;
     int b2;
     char move;          // choose candy for move
+
     zmq_send(pusher, colum_ask, strlen(colum_ask), 0);
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_colum, strlen(get_colum));
     zmq_recv(sub, buffer, 256, 0);
