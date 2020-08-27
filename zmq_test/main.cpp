@@ -70,16 +70,6 @@ int main()
 
 void Setup()
 {
-    cout << "geef aantal rijen(min 5, max 9): ";
-    cin >> a;
-    cout << "geef aantal kolomen(min 5, max 9): ";
-    cin >> b;
-    get_x[9]=a;
-    get_y[9]=b;
-
-    x=a-'0';
-    y=b-'0';
-
     zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
     zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
     //zmq_connect(pusher, "tcp://localhost:24041");
@@ -89,12 +79,21 @@ void Setup()
     zmq_send(pusher, start_ask, strlen(start_ask), 0);
     zmq_recv(sub, buffer, 256, 0);
 
-    Sleep(1);
+    Sleep(500);
+    cout << "geef aantal rijen(min 5, max 9): ";
+    cin >> a;
+    get_x[9]=a;
+    x=a-'0';
     zmq_send(pusher, get_x, strlen(get_x), 0);
-    Sleep(1);
-    zmq_send(pusher, get_y, strlen(get_y), 0);
-    Sleep(1);
 
+    Sleep(500);
+    cout << "geef aantal kolomen(min 5, max 9): ";
+    cin >> b;
+    get_y[9]=b;
+    y=b-'0';
+    zmq_send(pusher, get_y, strlen(get_y), 0);
+
+    Sleep(500);
     Print_Grid();
 }
 
