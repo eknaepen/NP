@@ -17,6 +17,12 @@ using namespace std;
 
 int main()
 {
+    zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
+    //zmq_connect(pusher, "tcp://localhost:24041");
+    //zmq_connect( sub, "tcp://localhost:24042");
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, candy_zmq, strlen(candy_zmq));
+
     while(loop==0)
     {
         switch(NextState)
@@ -70,14 +76,9 @@ int main()
 
 void Setup()
 {
-    zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
-    zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
-    //zmq_connect(pusher, "tcp://localhost:24041");
-    //zmq_connect( sub, "tcp://localhost:24042");
-
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, start_ans, strlen(start_ans));
     zmq_send(pusher, start_ask, strlen(start_ask), 0);
-    zmq_recv(sub, buffer, 256, 0);
+    zmq_recv(sub, buffer, 14, 0);
 
     Sleep(500);
     cout << "geef aantal rijen(min 5, max 9): ";

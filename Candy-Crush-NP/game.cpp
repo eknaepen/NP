@@ -4,34 +4,40 @@ using namespace std;
 
 Game::Game()
 {
-    char start_ask[]="Candy>start?>";
-    char start_ans[]="Candy>start!>";
-    char get_x[]="Candy>x!>";
-    char get_y[]="Candy>y!>";
-    char play[]="Candy>play!>";
-    //char get_score[]="Candy>score!>";
-    //char get_turn[]="Candy>turn!>";
-
-    char buf[13];
-
     level = new Level();
 
-    zmq_setsockopt(level->sub, ZMQ_SUBSCRIBE, start_ask, strlen(start_ask));
+    //zmq_setsockopt(level->sub, ZMQ_SUBSCRIBE, start_ask, strlen(start_ask));
 
     zmq_recv(level->sub, buf, 13, 0);
-    zmq_send(level->pusher, start_ans, strlen(start_ans), 0);
+    buf[13]='\0';
+    //cout << buf << endl;
+    if(strcmp(buf,start_ask)==0)
+    {
+        zmq_send(level->pusher, start_ans, strlen(start_ans), 0);
+        buf[0]='\0';
+    }
 
-    buf[0]='\0';
+    //zmq_setsockopt(level->sub , ZMQ_SUBSCRIBE, get_x, strlen(get_x));
 
-    zmq_setsockopt(level->sub , ZMQ_SUBSCRIBE, get_x, strlen(get_x));
     zmq_recv(level->sub, buf, 10, 0);
-    x=buf[9]-'0';
-    buf[0]='\0';
+    //cout << buf << endl;
+    if(buf[7]=='x')
+    {
+        x=buf[9]-'0';
+        buf[0]='\0';
+    }
 
-    zmq_setsockopt(level->sub , ZMQ_SUBSCRIBE, get_y, strlen(get_y));
+    //zmq_setsockopt(level->sub , ZMQ_SUBSCRIBE, get_y, strlen(get_y));
+
     zmq_recv(level->sub, buf, 10, 0);
-    y=buf[9]-'0';
-    buf[0]='\0';
+    //cout << buf << endl;
+    if(buf[7]=='y')
+    {
+        y=buf[9]-'0';
+        buf[0]='\0';
+    }
+
+    //cout << x << endl << y << endl;
 
     level->MakeLevel(x,y);
     //level->MakeLevel(5,5);
@@ -41,7 +47,7 @@ Game::Game()
     for(int i=0;i<limit;i++)        // make sure the turn limit is not crossed
     {
         int quit;
-        zmq_setsockopt(level->sub, ZMQ_SUBSCRIBE, play, strlen(play));
+        //zmq_setsockopt(level->sub, ZMQ_SUBSCRIBE, play, strlen(play));
         zmq_recv(level->sub, buf, 13, 0);
         quit=buf[12]-'0';
         buf[0]='\0';

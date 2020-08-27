@@ -16,6 +16,8 @@ public:
     int c;                      // amonut of colums
     unsigned char grid[10][10]; // grid as playing field
 
+    char candy_zmq[8]="Candy!>";
+
     void * context;
     void * pusher;
     void * sub;

@@ -11,6 +11,7 @@ Level::Level()        // create and fill grid --> playing field or level
     zmq_connect(sub, "tcp://benternet.pxl-ea-ict.be:24042");
     //zmq_connect(pusher, "tcp://localhost:24041");
     //zmq_connect( sub, "tcp://localhost:24042");
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, candy_zmq, strlen(candy_zmq));
 }
 
 Level::~Level()
@@ -47,27 +48,32 @@ void Level::MakeLevel(int row, int colum)
 
 void Level::MakeString()
 {
-    char buffer[256];
+    char buffer[13]="";
     char buff[c];
-    char grid_ask[]="Candy>grid?>";
-    char tag[13]="Candy>grid!>";
+    char grid_ask[]="Candy!>grid>";
+    char grid_ans[]="Candy?>grid>";
     char message[13+c];
 
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, grid_ask, strlen(grid_ask));
-    zmq_recv(sub, buffer, 256, 0);
-
-    for(int x=0;x<r;x++)
+    //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, grid_ask, strlen(grid_ask));
+    //cout << buffer << endl;
+    zmq_recv(sub, buffer, 13, 0);
+    //cout << buffer << endl << grid_ask << endl;
+    //cout << strcmp(buffer,grid_ask) << endl;
+    if(strcmp(buffer,grid_ask)==0)
     {
-        message[0]='\0';
-        for(int y=0;y<c;y++)
+        for(int x=0;x<r;x++)
         {
-            buff[y]=grid[x][y];
+            message[0]='\0';
+            for(int y=0;y<c;y++)
+            {
+                buff[y]=grid[x][y];
+            }
+            strcat(message, grid_ans);
+            strcat(message,buff);
+            message[13+c]='\0';
+            zmq_send(pusher, message, strlen(message), 0);
+            //cout << message << endl;
         }
-        strcat(message, tag);
-        strcat(message,buff);
-        message[13+c]='\0';
-        zmq_send(pusher, message, strlen(message), 0);
-        //cout << message << endl;
     }
 }
 
@@ -95,13 +101,13 @@ void Level::printGrid()     // print grid
 void Level::Move()      // make a move on the field
 {
     char buffer[256];
-    char colum_ask[]="Candy>colum?>";
-    char get_colum[]="Candy>colum!>";
-    char row_ask[]="Candy>row?>";
-    char get_row[]="Candy>row!>";
-    char ask_move[]="Candy>move?>";
-    char get_move[]="Candy>move!>";
-    char legal[]="Candy>legal!>";
+    char colum_ask[]="Candy?>colum>";
+    char get_colum[]="Candy!>colum>";
+    char row_ask[]="Candy?>row>";
+    char get_row[]="Candy!>row>";
+    char ask_move[]="Candy?>move>";
+    char get_move[]="Candy!>move>";
+    char legal[]="Candy?>legal>";
 
     int a1;
     int b1;
@@ -110,15 +116,15 @@ void Level::Move()      // make a move on the field
     char move;          // choose candy for move
 
     zmq_send(pusher, colum_ask, strlen(colum_ask), 0);
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_colum, strlen(get_colum));
-    zmq_recv(sub, buffer, 256, 0);
+    //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_colum, strlen(get_colum));
+    zmq_recv(sub, buffer, 14, 0);
     b1=buffer[13]-'0';
     b1++;
     buffer[0]='\0';
 
     zmq_send(pusher, row_ask, strlen(row_ask), 0);
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_row, strlen(get_row));
-    zmq_recv(sub, buffer, 256, 0);
+    //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_row, strlen(get_row));
+    zmq_recv(sub, buffer, 12, 0);
     a1=buffer[11]-'0';
     buffer[0]='\0';
 
@@ -129,8 +135,8 @@ void Level::Move()      // make a move on the field
     cout << endl;*/
 
     zmq_send(pusher, ask_move, strlen(ask_move), 0);
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_move, strlen(get_move));
-    zmq_recv(sub, buffer, 256, 0);
+    //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_move, strlen(get_move));
+    zmq_recv(sub, buffer, 13, 0);
     move=buffer[12];
     buffer[0]='\0';
     //cout << buffer << endl << move << endl;
