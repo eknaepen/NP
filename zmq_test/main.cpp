@@ -80,21 +80,18 @@ void Setup()
     zmq_send(pusher, start_ask, strlen(start_ask), 0);
     zmq_recv(sub, buffer, 14, 0);
 
-    Sleep(500);
     cout << "geef aantal rijen(min 5, max 9): ";
     cin >> a;
     get_x[9]=a;
     x=a-'0';
     zmq_send(pusher, get_x, strlen(get_x), 0);
 
-    Sleep(500);
     cout << "geef aantal kolomen(min 5, max 9): ";
     cin >> b;
     get_y[9]=b;
     y=b-'0';
     zmq_send(pusher, get_y, strlen(get_y), 0);
 
-    Sleep(500);
     Print_Grid();
 }
 
