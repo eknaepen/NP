@@ -32,7 +32,7 @@ int main()
                 NextState=Play;
                 break;
             case Play:
-                cout << "Give up=0, Play=1  :";
+                cout << "Give up=0, Play=1: ";
                 cin >> quit;
                 play[12]=quit;
                 zmq_send(pusher, play, strlen(play), 0);
@@ -129,6 +129,18 @@ void Move()
 {
     char move[1];
     int illegal;
+    int shuffle;
+
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, shuffle_ask, strlen(shuffle_ask));
+    zmq_recv(sub, buffer, 256, 0);
+    cout << "shuffle=1, don't shuffle=0: ";
+    cin >> shuffle;
+    shuffle_ans[15]=shuffle;
+    zmq_send(pusher, shuffle_ans, strlen(shuffle_ans), 0);
+    if(shuffle)
+    {
+        Print_Grid();
+    }
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, colum_ask, strlen(colum_ask));
     zmq_recv(sub, buffer, 256, 0);

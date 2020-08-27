@@ -6,6 +6,8 @@ GameMode NextState=StartUp;
 
 char buffer[256];
 char candy_zmq[]="Candy?>";
+char shuffle_ask[]="Candy?>shuffle>";
+char shuffle_ans[]="Candy!>shuffle>";
 char start_ask[]="Candy!>start>";
 char start_ans[]="Candy?>start>";
 char grid_ask[]="Candy!>grid>";

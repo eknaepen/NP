@@ -27,7 +27,6 @@ public:
     Game();
     ~Game(){delete level;}
     void Round();
-    void SetUp();
 private:
     const int limit=3;  // max turns in game
 };

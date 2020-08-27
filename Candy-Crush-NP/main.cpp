@@ -3,13 +3,11 @@
 #include "game.h"
 using namespace std;
 
-typedef enum{StartUp, Play, Reset, End}GameMode; // set-up for state machine
+typedef enum{StartUp, Play}GameMode; // set-up for state machine
 GameMode NextState=StartUp;
 
 int loop=0;
 int reset;
-
-
 
 int main()
 {
@@ -25,21 +23,6 @@ int main()
             case Play:
                 game = new Game;    // new game
                 NextState=StartUp;
-                break;
-            case Reset:
-                cout << "play again press 1: ";
-                cin >> reset;       // reset yes=1
-                if(reset==1)
-                {
-                    NextState=Play;
-                }
-                else
-                {
-                    NextState=End;  // shutdown program
-                }
-                break;
-            case End:
-                loop=1;
                 break;
         }
     }

@@ -15,8 +15,11 @@ public:
     int r;                      // amount of rows
     int c;                      // amonut of colums
     unsigned char grid[10][10]; // grid as playing field
+    int reset=0;
 
     char candy_zmq[8]="Candy!>";
+    char start_ask[14]="Candy!>start>";
+    char start_ans[14]="Candy?>start>";
 
     void * context;
     void * pusher;
@@ -32,6 +35,7 @@ public:
     int Check_Move(int x, int y, char moves);  // check if move is legal position wise
     bool Check_Break_Move(int x, int y);        // check if move is legal combo wise --> no combo no move
     void Find_Combo();          // check for combo's on the field and replace them by new candy
+    void Shuffle();
 
 
 private:

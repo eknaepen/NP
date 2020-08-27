@@ -24,6 +24,11 @@ Level::~Level()
 
 void Level::MakeLevel(int row, int colum)
 {
+    if(reset)
+    {
+        //cout << "makelevel" << endl;
+        return;
+    }
     r=row;
     c=colum+2;
     srand((unsigned)time(nullptr));
@@ -48,6 +53,11 @@ void Level::MakeLevel(int row, int colum)
 
 void Level::MakeString()
 {
+    if(reset)
+    {
+        //cout << "makestring" << endl;
+        return;
+    }
     char buffer[13]="";
     char buff[c];
     char grid_ask[]="Candy!>grid>";
@@ -57,9 +67,13 @@ void Level::MakeString()
     //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, grid_ask, strlen(grid_ask));
     //cout << buffer << endl;
     zmq_recv(sub, buffer, 13, 0);
-    //cout << buffer << endl << grid_ask << endl;
-    //cout << strcmp(buffer,grid_ask) << endl;
-    if(strcmp(buffer,grid_ask)==0)
+    if(buffer[7]=='s' && buffer[8]=='t')
+    {
+        reset=1;
+        zmq_send(pusher, start_ans, strlen(start_ans), 0);
+        buffer[0]='\0';
+    }
+    else if(strcmp(buffer,grid_ask)==0)
     {
         for(int x=0;x<r;x++)
         {
@@ -100,7 +114,14 @@ void Level::printGrid()     // print grid
 
 void Level::Move()      // make a move on the field
 {
+    if(reset)
+    {
+        //cout << "move" << endl;
+        return;
+    }
     char buffer[256];
+    char shuffle_ask[]="Candy?>shuffle>";
+    char shuffle_ans[]="Candy!>shuffle>";
     char colum_ask[]="Candy?>colum>";
     char get_colum[]="Candy!>colum>";
     char row_ask[]="Candy?>row>";
@@ -114,10 +135,34 @@ void Level::Move()      // make a move on the field
     int a2;
     int b2;
     char move;          // choose candy for move
+    int shuffle;
+
+    zmq_send(pusher, shuffle_ask,strlen(shuffle_ask),0);
+    zmq_recv(sub, buffer, 17, 0);
+    if(buffer[7]=='s' && buffer[8]=='t')
+    {
+        reset=1;
+        zmq_send(pusher, start_ans, strlen(start_ans), 0);
+        buffer[0]='\0';
+        return;
+    }
+    shuffle=buffer[16];
+    buffer[0]='\0';
+    if(shuffle)
+    {
+        Shuffle();
+    }
 
     zmq_send(pusher, colum_ask, strlen(colum_ask), 0);
     //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_colum, strlen(get_colum));
     zmq_recv(sub, buffer, 14, 0);
+    if(buffer[7]=='s' && buffer[8]=='t')
+    {
+        reset=1;
+        zmq_send(pusher, start_ans, strlen(start_ans), 0);
+        buffer[0]='\0';
+        return;
+    }
     b1=buffer[13]-'0';
     b1++;
     buffer[0]='\0';
@@ -125,6 +170,13 @@ void Level::Move()      // make a move on the field
     zmq_send(pusher, row_ask, strlen(row_ask), 0);
     //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_row, strlen(get_row));
     zmq_recv(sub, buffer, 12, 0);
+    if(buffer[7]=='s' && buffer[8]=='t')
+    {
+        reset=1;
+        zmq_send(pusher, start_ans, strlen(start_ans), 0);
+        buffer[0]='\0';
+        return;
+    }
     a1=buffer[11]-'0';
     buffer[0]='\0';
 
@@ -137,6 +189,13 @@ void Level::Move()      // make a move on the field
     zmq_send(pusher, ask_move, strlen(ask_move), 0);
     //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_move, strlen(get_move));
     zmq_recv(sub, buffer, 13, 0);
+    if(buffer[7]=='s' && buffer[8]=='t')
+    {
+        reset=1;
+        zmq_send(pusher, start_ans, strlen(start_ans), 0);
+        buffer[0]='\0';
+        return;
+    }
     move=buffer[12];
     buffer[0]='\0';
     //cout << buffer << endl << move << endl;
@@ -263,6 +322,11 @@ bool Level::Check_Break_Move(int x, int y)              // check if the move mad
 
 void Level::Find_Combo()                            // check the field for combo's and turn into new candy's
 {
+    if(reset)
+    {
+        //cout << "find combo" << endl;
+        return;
+    }
     Candy_Field * new1 = new Candy_Field;
     Candy_Field * new2 = new Candy_Field;
     Candy_Field * new3 = new Candy_Field;
@@ -314,4 +378,28 @@ void Level::Find_Combo()                            // check the field for combo
             }
         }
     }
+}
+
+void Level::Shuffle()
+{
+    //x=row, y=colum
+    for(int i=1; i<r; i++)
+    {
+        for(int j=1; j<c-2; j++)
+        {
+            grid[0][j]^=grid[i][j];
+            grid[i][j]^=grid[0][j];
+            grid[0][j]^=grid[i][j];
+        }
+    }
+    for(int i=0; i<r; i++)
+    {
+        for(int j=2; j<c-1; j++)
+        {
+            grid[i][1]^=grid[i][j];
+            grid[i][j]^=grid[i][1];
+            grid[i][1]^=grid[i][j];
+        }
+    }
+    MakeString();
 }
