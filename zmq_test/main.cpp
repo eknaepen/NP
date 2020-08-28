@@ -130,6 +130,7 @@ void Move()
     char move[1];
     int illegal;
     int shuffle;
+    int hint;
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, shuffle_ask, strlen(shuffle_ask));
     zmq_recv(sub, buffer, 256, 0);
@@ -140,6 +141,18 @@ void Move()
     if(shuffle)
     {
         Print_Grid();
+    }
+
+    cout << "Hint? --> yes=1, no=0: ";
+    cin >> hint;
+    if(hint)
+    {
+        hint_ask[12]=hint+'0';
+        zmq_send(pusher, hint_ask, strlen(hint_ask), 0);
+        zmq_setsockopt(sub, ZMQ_SUBSCRIBE, hint_ans, strlen(hint_ans));
+        zmq_recv(sub, buffer, 256, 0);
+        cout << "Colum: " << buffer[12]-'0' << endl << "Row: " << buffer[14]-'0' << endl << "Move: " << buffer[16] << endl;
+        buffer[0]='\0';
     }
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, colum_ask, strlen(colum_ask));
@@ -163,11 +176,18 @@ void Move()
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, ask_move, strlen(ask_move));
     zmq_recv(sub, buffer, 256, 0);
     buffer[0]='\0';
-    cout << "Up=U, Down=D, Left=L, Right=R\n" << "Choice: ";
+    cout << "Up=U, Down=D, Left=L, Right=R, Crush=C" << endl << "Choice: ";
     cin >> move;
     cout << endl;
-    get_move[12]=move[0];
-    zmq_send(pusher, get_move, strlen(get_move), 0);
+    if(move[0]=='C')
+    {
+        zmq_send(pusher, crush, strlen(crush), 0);
+    }
+    else
+    {
+        get_move[12]=move[0];
+        zmq_send(pusher, get_move, strlen(get_move), 0);
+    }
 
     zmq_setsockopt(sub, ZMQ_SUBSCRIBE, legal, strlen(legal));
     zmq_recv(sub, buffer, 256, 0);

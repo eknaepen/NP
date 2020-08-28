@@ -36,6 +36,7 @@ public:
     bool Check_Break_Move(int x, int y);        // check if move is legal combo wise --> no combo no move
     void Find_Combo();          // check for combo's on the field and replace them by new candy
     void Shuffle();
+    void Hint();
 
 
 private:

@@ -129,6 +129,7 @@ void Level::Move()      // make a move on the field
     char ask_move[]="Candy?>move>";
     char get_move[]="Candy!>move>";
     char legal[]="Candy?>legal>";
+    char crush[]="Candy!>crush>";
 
     int a1;
     int b1;
@@ -151,6 +152,13 @@ void Level::Move()      // make a move on the field
     if(shuffle)
     {
         Shuffle();
+    }
+
+    zmq_recv(sub, buffer, 13, 0);
+    //cout << buffer << endl;
+    if(buffer[12]-'0')
+    {
+        Hint();
     }
 
     zmq_send(pusher, colum_ask, strlen(colum_ask), 0);
@@ -189,6 +197,7 @@ void Level::Move()      // make a move on the field
     zmq_send(pusher, ask_move, strlen(ask_move), 0);
     //zmq_setsockopt(sub, ZMQ_SUBSCRIBE, get_move, strlen(get_move));
     zmq_recv(sub, buffer, 13, 0);
+    //cout << buffer << endl;
     if(buffer[7]=='s' && buffer[8]=='t')
     {
         reset=1;
@@ -196,67 +205,80 @@ void Level::Move()      // make a move on the field
         buffer[0]='\0';
         return;
     }
-    move=buffer[12];
-    buffer[0]='\0';
-    //cout << buffer << endl << move << endl;
-
-    if(Check_Move(b1,a1,move)==3)  // Up        // if move is legal position wise switch the candy's
+    else if(buffer[7]=='c')     // only command with a c after candy!
     {
-        a2=a1-1;
-        b2=b1;
-    }
-    else if(Check_Move(b1,a1,move)==4) //Down
-    {
-        a2=a1+1;
-        b2=b1;
-    }
-    else if(Check_Move(b1,a1,move)==1) //Left
-    {
-        a2=a1;
-        b2=b1-1;
-
-    }
-    else if(Check_Move(b1,a1,move)==2) //Right
-    {
-        a2=a1;
-        b2=b1+1;
+        //cout << "test" << endl;
+        Field* candy_field = new Candy_Field;
+        grid[a1][b1]=candy_field->setsign();
+        legal[13]='0';
+        zmq_send(pusher, legal,strlen(legal), 0);
+        MakeString();
+        buffer[0]='\0';
     }
     else
     {
-        a2=a1;
-        b2=b1;
-        legal[13]='1';
-        zmq_send(pusher, legal,strlen(legal), 0);
-        //cout << endl << "Illegal move --> no combo" << endl << endl;
-        //printGrid();
-        MakeString();
-        Move();
-    }
+        move=buffer[12];
+        buffer[0]='\0';
 
-    grid[a1][b1]^=grid[a2][b2];
-    grid[a2][b2]^=grid[a1][b1];
-    grid[a1][b1]^=grid[a2][b2];
+        //cout << buffer << endl << move << endl;
 
+        if(Check_Move(b1,a1,move)==3)  // Up        // if move is legal position wise switch the candy's
+        {
+            a2=a1-1;
+            b2=b1;
+        }
+        else if(Check_Move(b1,a1,move)==4) //Down
+        {
+            a2=a1+1;
+            b2=b1;
+        }
+        else if(Check_Move(b1,a1,move)==1) //Left
+        {
+            a2=a1;
+            b2=b1-1;
 
-    if(Check_Break_Move(a2,b2))         // if move is illegal combo wise switch back and try again
-    {
+        }
+        else if(Check_Move(b1,a1,move)==2) //Right
+        {
+            a2=a1;
+            b2=b1+1;
+        }
+        else
+        {
+            a2=a1;
+            b2=b1;
+            legal[13]='1';
+            zmq_send(pusher, legal,strlen(legal), 0);
+            //cout << endl << "Illegal move --> no combo" << endl << endl;
+            //printGrid();
+            MakeString();
+            Move();
+        }
+
         grid[a1][b1]^=grid[a2][b2];
         grid[a2][b2]^=grid[a1][b1];
         grid[a1][b1]^=grid[a2][b2];
 
-        legal[13]='1';
-        zmq_send(pusher, legal,strlen(legal), 0);
-        //cout << endl << "Illegal move --> no combo" << endl << endl;
-        //printGrid();
-        MakeString();
-        Move();
-    }
-    else
-    {
-        legal[13]='0';
-        zmq_send(pusher, legal,strlen(legal), 0);
-        //printGrid();
-        MakeString();
+        if(Check_Break_Move(a2,b2))         // if move is illegal combo wise switch back and try again
+        {
+            grid[a1][b1]^=grid[a2][b2];
+            grid[a2][b2]^=grid[a1][b1];
+            grid[a1][b1]^=grid[a2][b2];
+
+            legal[13]='1';
+            zmq_send(pusher, legal,strlen(legal), 0);
+            //cout << endl << "Illegal move --> no combo" << endl << endl;
+            //printGrid();
+            MakeString();
+            Move();
+        }
+        else
+        {
+            legal[13]='0';
+            zmq_send(pusher, legal,strlen(legal), 0);
+            //printGrid();
+            MakeString();
+        }
     }
 }
 
@@ -375,6 +397,151 @@ void Level::Find_Combo()                            // check the field for combo
                 grid[x][y+1]=new2->setsign();
                 grid[x][y+2]=new3->setsign();
                 score++;
+            }
+        }
+    }
+}
+
+void Level::Hint()
+{
+    char hint_ask[]="Candy!>hint>";
+    char hint_ans[18]="Candy?>hint>";
+    int hint=1;
+    for(int x=0;x<r;x++)
+    {
+        for(int y=1;y<c-1;y++)              // loop trough the grid/field and check in all directions
+        {
+            if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x+3][y] && hint)
+            {
+                hint_ans[12]=y-1+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+3+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='U';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x-2][y] && hint)
+            {
+                hint_ans[12]=y-1+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x-2+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='D';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x+2][y-1] && hint)
+            {
+                hint_ans[12]=y-2+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+2+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='R';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x+2][y+1] && hint)
+            {
+                hint_ans[12]=y+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+2+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='L';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x-1][y-1] && hint)
+            {
+                hint_ans[12]=y-2+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x-1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='R';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x+1][y] && grid[x][y]==grid[x-1][y+1] && hint)
+            {
+                hint_ans[12]=y+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x-1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='L';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x][y+3] && hint)
+            {
+                hint_ans[12]=y+2+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='L';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x][y-2] && hint)
+            {
+                hint_ans[12]=y-3+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='R';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x+1][y+2] && hint)
+            {
+                hint_ans[12]=y+1+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='U';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x-1][y+2] && hint)
+            {
+                hint_ans[12]=y+1+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x-1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='D';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x+1][y-1] && hint)
+            {
+                hint_ans[12]=y-2+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x+1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='U';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
+            }
+            else if(grid[x][y]==grid[x][y+1] && grid[x][y]==grid[x-1][y-1] && hint)
+            {
+                hint_ans[12]=y-2+'0';
+                hint_ans[13]='>';
+                hint_ans[14]=x-1+'0';
+                hint_ans[15]='>';
+                hint_ans[16]='D';
+                hint_ans[17]='>';
+                zmq_send(pusher, hint_ans, strlen(hint_ans), 0);
+                hint=0;
             }
         }
     }
